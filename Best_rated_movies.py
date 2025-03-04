@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.types import StructType, StructField, IntegerType, FloatType
+from pyspark.sql.types import StructType, StructField, IntegerType, FloatType, StringType, DateType
 import json
 from pathlib import Path
 
@@ -63,7 +63,30 @@ def compute_average_rating(df: DataFrame) -> DataFrame:
 DF_AVG_RATING = compute_average_rating(DF_RAW)
 
 
+schema_metadata = StructType([
+    StructField("title", StringType(), True),
+    StructField("directedBy", StringType(), True),
+    StructField("starring", StringType(), True),
+    StructField("dateAdded", DateType(), True),
+    StructField("avgRating", FloatType(), True),
+    StructField("imdbId", IntegerType(), True),
+    StructField("item_id", IntegerType(), True)
+])
+
+fichier_json_2 = "../raw/metadata.json"
+assert Path(fichier_json_2).exists(), f"{fichier_json_2} does not exist"
+
+DATA_FILE_PATHS_2 = [fichier_json_2]
+DF_RAW_2 = read_json_with_schema(data_file_paths=DATA_FILE_PATHS_2, schema=schema_metadata)
+
+from pyspark.sql.functions import col
+
+
+df_best_rated_movies = DF_AVG_RATING.join(
+    DF_RAW_2, on="item_id", how="inner"
+).select("title", "avg_rating")
+
 from pyspark.sql.functions import desc
 
-DF_AVG_RATING_SORTED = DF_AVG_RATING.orderBy(desc("avg_rating"))
-DF_AVG_RATING_SORTED.show(10)
+df_best_rated_movies_sorted = df_best_rated_movies.orderBy(desc("avg_rating"))
+df_best_rated_movies_sorted.show(10, truncate=False)
