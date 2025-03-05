@@ -5,7 +5,7 @@
 Le fichier concerné est Best_rated_movies.py. On utilise tout d'abord ce qu'on avait vu en TP pour charger les JSONs avec leur schéma dans des DataFrames. On a deux JSONs, celui contenant les votes (ratings.json) et celui contenant les métadatas (metadata.json).\
 Au début, on triait simplement par note ("rating"), mais on avait plein de films dont la note était de 5/5. Après une courte réflexion, on a compris que certains films avaient été notés par une seule, ou deux ou trois personnes. On a donc eu l'idée de compter le nombre de votes, de trier à la fois par note, puis pour les notes identiques par nombre de votes, et d'accepter uniquement les notes auxquelles plus de 50 personnes ont contribué.\
 
-'''
+```
 +--------------------------------+------------------+------------+\             
 |title---------------------------|avg_rating--------|count_rating|\
 +--------------------------------+------------------+------------+\
@@ -20,7 +20,8 @@ Au début, on triait simplement par note ("rating"), mais on avait plein de film
 |Blue Planet II (2017)-----------|4.318456883509834-|661---------|\
 |Usual Suspects, The (1995)------|4.290028526351017-|62749-------|\
 +--------------------------------+------------------+------------+\
-'''
+``` 
+
 
 # 4. Faire tourner sur deux machines
 # 5. Faire tourner sur un cluster hadoop
