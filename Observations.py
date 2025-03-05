@@ -45,8 +45,8 @@ def afficher_premieres_lignes_json(fichier, nb_lignes=5):
 
 
 # Exemple d'utilisation
-fichier_json_1 = "genome_2021/movie_dataset_public_final/raw/ratings.json"
-fichier_json_2 = "genome_2021/movie_dataset_public_final/raw/metadata.json"
+fichier_json_1 = "../raw/ratings.json"
+fichier_json_2 = "../raw/metadata.json"
 
 afficher_premieres_lignes_json(fichier_json_1)
 afficher_premieres_lignes_json(fichier_json_2)

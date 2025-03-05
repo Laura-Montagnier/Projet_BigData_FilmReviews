@@ -37,7 +37,7 @@ schema = StructType([
 ])
 
 # Le chemin exact vers le fichier JSON
-fichier_json_1 = "genome_2021/movie_dataset_public_final/raw/ratings.json"
+fichier_json_1 = "../raw/ratings.json"
 assert Path(fichier_json_1).exists(), f"{fichier_json_1} does not exist"
 DATA_FILE_PATHS = [fichier_json_1]
 
