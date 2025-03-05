@@ -4,6 +4,11 @@ import json
 from pathlib import Path
 from pyspark.sql.functions import desc, col, count
 
+#This code uses two Json, ratings and metadata. It returns the best rated movies,
+#sorted by ratings, as well as the number of votes. To avoid having movies that 
+#seem incredible but are incredible only for two or three persons, we are adding
+#a limit : more than 50 people must have voted for the rating to appear.
+
 
 def get_spark() -> SparkSession:
     """
@@ -56,8 +61,7 @@ DF_AVG_RATING = compute_average_rating(DF_RAW)
 
 DF_RATING_COUNT = DF_RAW.groupBy("item_id").count().withColumnRenamed("count", "count_rating")
 DF_AVG_WITH_COUNT = DF_AVG_RATING.join(DF_RATING_COUNT, on="item_id", how="inner")
-
-
+DF_AVG_WITH_COUNT_FILTERED = DF_AVG_WITH_COUNT.filter(col("count_rating")>50)
 
 schema_metadata = StructType([
     StructField("title", StringType(), True),
@@ -76,7 +80,7 @@ DATA_FILE_PATHS_2 = [fichier_json_2]
 DF_RAW_2 = read_json_with_schema(data_file_paths=DATA_FILE_PATHS_2, schema=schema_metadata)
 
 
-df_best_rated_movies = DF_AVG_WITH_COUNT.join(
+df_best_rated_movies = DF_AVG_WITH_COUNT_FILTERED.join(
     DF_RAW_2, on="item_id", how="inner"
 ).select("title", "avg_rating", "count_rating")
 
