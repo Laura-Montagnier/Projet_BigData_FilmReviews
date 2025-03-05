@@ -1,4 +1,5 @@
 import json
+import os
 
 def afficher_premieres_lignes_json(fichier, nb_lignes=5):
     try:
@@ -44,9 +45,13 @@ def afficher_premieres_lignes_json(fichier, nb_lignes=5):
         print("=" * 60)
 
 
-# Exemple d'utilisation
-fichier_json_1 = "genome_2021/movie_dataset_public_final/raw/ratings.json"
-fichier_json_2 = "genome_2021/movie_dataset_public_final/raw/metadata.json"
+# Chemin vers le répertoire contenant les fichiers JSON
+repertoire_raw = "genome_2021/movie_dataset_public_final/raw"
 
-afficher_premieres_lignes_json(fichier_json_1)
-afficher_premieres_lignes_json(fichier_json_2)
+# Parcourir tous les fichiers dans le répertoire 'raw'
+for nom_fichier in os.listdir(repertoire_raw):
+    # Vérifier que le fichier est bien un fichier JSON
+    if nom_fichier.endswith('.json'):
+        chemin_fichier = os.path.join(repertoire_raw, nom_fichier)
+        print(f"\nPremières lignes du fichier : {chemin_fichier}")
+        afficher_premieres_lignes_json(chemin_fichier)
