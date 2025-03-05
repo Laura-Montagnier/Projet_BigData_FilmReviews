@@ -22,7 +22,11 @@ Au début, on triait simplement par note ("rating"), mais on avait plein de film
 +--------------------------------+------------------+------------+\
 ``` 
 
+# 4. Ajouter des tags en fonction des reviews
 
-# 4. Faire tourner sur deux machines
-# 5. Faire tourner sur un cluster hadoop
-# 6. Charger directement les fichiers pour pas avoir à download
+On a deux JSONs intéressants : tags.json et reviews.json. tags.json contient une liste de tags possibles avec leurs IDs, et reviews.json contient l'ID du film qu'on commente avec le commentaire. On peut parser chaque commentaire pour voir s'il y a du texte qui correspond à un tag. Si c'est le cas, on enregistre dans un fichier parquet l'ID du film et l'ID du tag. Ce fichier parquet s'appelle Tags_according_to_reviews.parquet, créé par le script python éponyme.\
+Une fois ce parquet créé, on peut obtenir une liste des films avec leurs tags ! Il suffit de croiser metadata.json, tags.json et Tags_according_to_reviews.parquet en utilisant les colonnes item_id qui est l'ID des tags, et id qui est l'ID des films.\
+
+# 5. Faire tourner sur deux machines
+# 6. Faire tourner sur un cluster hadoop
+# 7. Charger directement les fichiers pour pas avoir à download
