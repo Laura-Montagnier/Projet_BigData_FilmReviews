@@ -1,16 +1,21 @@
+import os
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.types import StructType, StructField, IntegerType, FloatType
-import json
-from pathlib import Path
+
+
+# Définition des variables d'environnement
+SPARK_MASTER = "spark://" + os.getenv("SPARK_MASTER", "spark://129.104.73.59:7077")
+HDFS_BASE_PATH = os.getenv("HDFS_BASE_PATH", "hdfs://localhost:9000/user/blandine")
 
 
 def get_spark() -> SparkSession:
     """
-    Return a Spark session
+    Return a Spark session configured with the master URL
     """
     return SparkSession.builder \
         .appName("Rating Analysis") \
-        .master("spark://129.104.73.59:7077").getOrCreate()
+        .master(SPARK_MASTER) \
+        .getOrCreate()
 
 
 spark = get_spark()
@@ -20,25 +25,21 @@ def read_json_with_schema(data_file_paths: list[str], schema: StructType) -> Dat
     """
     Read JSON files using a predefined schema and return the DataFrame.
     """
-    # Lire les fichiers JSON en utilisant le schéma prédéfini
     df = spark.read.schema(schema).json(data_file_paths)
-    
-    # Afficher le schéma
     df.printSchema()
-    
     return df
 
 
-# Schéma déjà défini
+# Schéma des données JSON
 schema = StructType([
     StructField("item_id", IntegerType(), True),
     StructField("user_id", IntegerType(), True),
     StructField("rating", FloatType(), True)
 ])
 
-# Le chemin exact vers le fichier JSON sur HDFS
-fichier_json_1 = "hdfs://localhost:9000/user/blandine/ratings.json"
-DATA_FILE_PATHS = [fichier_json_1]
+# Définition des chemins d'entrée et de sortie sur HDFS
+DATA_FILE_PATHS = [f"{HDFS_BASE_PATH}/ratings.json"]
+OUTPUT_PATH = f"{HDFS_BASE_PATH}/output/ratings_parquet"
 
 # Lire les données en utilisant le schéma défini
 DF_RAW = read_json_with_schema(data_file_paths=DATA_FILE_PATHS, schema=schema)
@@ -47,7 +48,6 @@ DF_RAW = read_json_with_schema(data_file_paths=DATA_FILE_PATHS, schema=schema)
 assert DF_RAW is not None, "Returned result is None"
 assert isinstance(DF_RAW, DataFrame), "Returned result is not a valid DataFrame"
 
-# Affichage du nombre de lignes
 print(f"DF_RAW.count(): {DF_RAW.count()}")
 
 
@@ -55,16 +55,11 @@ def compute_average_rating(df: DataFrame) -> DataFrame:
     """
     Compute the average rating for each item_id
     """
-    # Group by item_id and compute the average rating
-    df_avg = df.groupBy("item_id").avg("rating").withColumnRenamed("avg(rating)", "avg_rating")
-    
-    return df_avg
+    return df.groupBy("item_id").avg("rating").withColumnRenamed("avg(rating)", "avg_rating")
 
 
 # Calcul de la moyenne des évaluations
 DF_AVG_RATING = compute_average_rating(DF_RAW)
-
-# Affichage des 10 premières lignes
 DF_AVG_RATING.show(10)
 
 
@@ -75,9 +70,7 @@ def write_to_parquet(df: DataFrame, output_path: str):
     df.write.mode("overwrite").parquet(output_path)
 
 
-# Emplacement de sortie pour les fichiers Parquet sur HDFS
-OUTPUT_PATH = "hdfs://localhost:9000/user/blandine/output/ratings_parquet"
-
+# Sauvegarde des résultats au format Parquet sur HDFS
 write_to_parquet(df=DF_AVG_RATING, output_path=OUTPUT_PATH)
 print(f"Output path {OUTPUT_PATH} has been written successfully.")
 
