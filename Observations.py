@@ -31,21 +31,6 @@ def afficher_premieres_lignes_json(fichier, nb_lignes=5):
             print("Premières lignes du fichier :")
             for line in lines:
                 print(line)
-            
-            # Revenir au début du fichier pour charger les données partiellement
-            f.seek(0)
-            premier_element = json.load(f)  
-
-            print("\nQuelques informations sur le fichier JSON :")
-            if isinstance(premier_element, dict):
-                print(f"- Type de données : Dictionnaire")
-                print(f"- Clés disponibles : {list(premier_element.keys())[:5]}...")  
-            elif isinstance(premier_element, list):
-                print(f"- Type de données : Liste")
-                print(f"- Nombre d'éléments dans la liste : {len(premier_element)}")
-                print(f"- Quelques éléments (premiers 3) : {premier_element[:3]}")  
-            else:
-                print(f"- Type de données inconnu au début : {type(premier_element)}")
 
         print("=" * 60)
 
@@ -61,8 +46,6 @@ repertoire_raw = "raw"
 if os.path.exists(repertoire_raw) and os.path.isdir(repertoire_raw):
     for nom_fichier in os.listdir(repertoire_raw):
         if nom_fichier.endswith('.json'):
-            if nom_fichier == "reviews.json":
-                continue
             chemin_fichier = os.path.join(repertoire_raw, nom_fichier)
             afficher_premieres_lignes_json(chemin_fichier)
 else:
